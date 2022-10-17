@@ -46,9 +46,13 @@ public class Client {
         stdin = new BufferedReader(new InputStreamReader(System.in));
 
         try{
+            System.out.println("Initiating connexion with " + srvAddress + " on port TCP:" + portNumber);
+
             clientSocket = new Socket(srvAddress, portNumber);
             out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+
+            System.out.println("Connected successfully");
 
             while(!Objects.equals(usrInput = stdin.readLine(), "exit")) {
                 out.write(usrInput);
@@ -60,23 +64,23 @@ public class Client {
             }
 
         } catch(IOException ex){
-            System.out.println("Error : " + ex.toString());
+            System.err.println("Error : " + ex.toString());
         }
         finally {
             try {
                 if (out != null) out.close();
             } catch (IOException ex) {
-                LOG.log(Level.SEVERE, ex.toString(), ex);
+                System.err.println("Error : " + ex.toString());
             }
             try {
                 if (in != null) in.close();
             } catch (IOException ex) {
-                LOG.log(Level.SEVERE, ex.toString(), ex);
+                System.err.println("Error : " + ex.toString());
             }
             try {
                 if (clientSocket != null && ! clientSocket.isClosed()) clientSocket.close();
             } catch (IOException ex) {
-                LOG.log(Level.SEVERE, ex.toString(), ex);
+                System.err.println("Error : " + ex.toString());
             }
         }
 
