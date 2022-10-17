@@ -34,3 +34,12 @@ For now only addition
 Send an error message
 ### Extensibility
 Allow to add more operation. subtraction, multiplication and so on
+## Example:
+    -Hello
+    -Hello, I can do "addtion"
+    -addtion;1;3
+    -result;4
+    -substraction;1;3
+    -error;"Unknown operation"
+    -bye
+    EOC
