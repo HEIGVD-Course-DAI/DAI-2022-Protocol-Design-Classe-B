@@ -100,7 +100,7 @@ public class Server {
             BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), StandardCharsets.UTF_8));
             BufferedWriter out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream(), StandardCharsets.UTF_8));
             String line;
-            out.write("HELLO\nBienvenue les opérations sont les suivantes: ADD, MULTIPLY\nFORMAT: OPERATION OPERAND1 OPERAND2\nPour quitter: QUIT\n");
+            out.write("HELLO\nBienvenue les opérations sont les suivantes: ADD, MULTIPLY\nFORMAT: OPERATION OPERAND1 OPERAND2\nPour quitter: QUIT\nEND_WELCOME\n");
             out.flush();
             while ((line = in.readLine()) != null) {
                 if (line.equalsIgnoreCase("QUIT")) {

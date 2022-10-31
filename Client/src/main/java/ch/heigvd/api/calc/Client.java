@@ -59,7 +59,11 @@ public class Client {
 
             // ugly way to read initialization data
             String info;
-            while (in.ready() && (info = in.readLine()) != null) {
+            while ((info = in.readLine()) != null) {
+                                
+                if(info.equals("END_WELCOME"))
+                    break;
+
                 System.out.println(info);
             }
 
