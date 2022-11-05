@@ -49,7 +49,7 @@ public class Client {
             String line;
             while ((line = stdin.readLine()) != null){
 
-                os.write(line + "CECIESTLAFINDELALIGNE");
+                os.write(line + "ThisIsTheEnd");
                 os.flush();
 
                 String response = is.readLine();
