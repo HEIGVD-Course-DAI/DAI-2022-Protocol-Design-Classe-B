@@ -84,7 +84,7 @@ public class Server {
                 String[] cuttedline = line.split(" ");
 
                 if (cuttedline.length != 3){
-                    out.write("the calculation should look like this : operation;arg1;arg2 ! Try again :\r\n");
+                    out.write("el cálculo debería verse así: operación arg1 arg2 !\r\n");
                     out.flush();
                     continue;
                 }
