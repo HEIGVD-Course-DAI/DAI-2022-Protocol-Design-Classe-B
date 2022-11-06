@@ -2,7 +2,6 @@ package ch.heigvd.api.calc;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -12,21 +11,26 @@ import java.util.logging.Logger;
 public class ServerWorker implements Runnable {
 
     private final static Logger LOG = Logger.getLogger(ServerWorker.class.getName());
+    private Socket clientSocket;
+    private BufferedReader in = null;
+    private BufferedWriter out = null;
+
 
     /**
      * Instantiation of a new worker mapped to a socket
      *
      * @param clientSocket connected to worker
      */
-    public ServerWorker(Socket clientSocket) {
+    public ServerWorker(Socket clientSocket) throws IOException {
         // Log output on a single line
         System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s%6$s%n");
-
-        /* TODO: prepare everything for the ServerWorker to run when the
-         *   server calls the ServerWorker.run method.
-         *   Don't call the ServerWorker.run method here. It has to be called from the Server.
-         */
-
+        try {
+            this.clientSocket = clientSocket;
+            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
+        } catch (IOException e) {
+            LOG.log(Level.SEVERE, null, e);
+        }
     }
 
     /**
@@ -34,16 +38,73 @@ public class ServerWorker implements Runnable {
      */
     @Override
     public void run() {
+        String line;
+        String pattern = "\\d+[/+*-]\\d+";
+        try {
+            out.write("Hello user!\n");
+            out.flush();
 
-        /* TODO: implement the handling of a client connection according to the specification.
-         *   The server has to do the following:
-         *   - initialize the dialog according to the specification (for example send the list
-         *     of possible commands)
-         *   - In a loop:
-         *     - Read a message from the input stream (using BufferedReader.readLine)
-         *     - Handle the message
-         *     - Send to result to the client
-         */
+            while (true) {
+                out.write("Please enter two integers seperated by any operation sign (+, -, *, /)\n");
+                out.flush();
+                LOG.info("Waiting for user input...");
 
+                line = in.readLine();
+
+                if (line.equals("exit")) break;
+
+                if (line.matches(pattern)) {
+                    LOG.info("Computing Value...");
+                    String[] numbers = line.split("\\D");
+                    String operator = line.replaceAll("\\d", "");
+                    String res = compute(Integer.parseInt(numbers[0]), Integer.parseInt(numbers[1]), operator);
+                    out.write(line + "=" + res + "\n");
+                    out.flush();
+                } else {
+                    LOG.info("Incorrect input");
+                    out.write("Error incorrect input !\n");
+                    out.flush();
+                }
+            }
+            out.write("Bye !\n");
+            out.flush();
+            LOG.log(Level.INFO, "Closing connection...");
+        } catch (IOException e) {
+            LOG.log(Level.SEVERE, null, e);
+        } finally {
+            try {
+                if (out != null) out.close();
+            } catch (IOException ex) {
+                LOG.log(Level.SEVERE, ex.toString(), ex);
+            }
+            try {
+                if (in != null) in.close();
+            } catch (IOException ex) {
+                LOG.log(Level.SEVERE, ex.toString(), ex);
+            }
+            try {
+                if (clientSocket != null && !clientSocket.isClosed()) clientSocket.close();
+            } catch (IOException ex) {
+                LOG.log(Level.SEVERE, ex.toString(), ex);
+            }
+        }
+    }
+
+    private String compute(int a, int b, String op) {
+        switch (op) {
+            case "+":
+                return String.valueOf(a + b);
+            case "-":
+                return String.valueOf(a - b);
+            case "*":
+                return String.valueOf(a * b);
+            case "/":
+                if (b == 0) {
+                    return "Error ! Division by 0";
+                }
+                return String.valueOf((double) a / b);
+            default:
+                return "Error ! Could not compute";
+        }
     }
 }

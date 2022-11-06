@@ -12,6 +12,7 @@ Who speaks first? <br>
 - The server will show a hello message then ask for user input.
 
 Who closes the connection and when? <br>
+both ends up connection when the client enters "exit"
 
 Messages:<br>
 What is the syntax of the messages?<br>
