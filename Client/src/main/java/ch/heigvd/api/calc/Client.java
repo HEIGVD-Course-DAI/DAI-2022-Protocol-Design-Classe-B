@@ -2,7 +2,6 @@ package ch.heigvd.api.calc;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,66 +22,49 @@ public class Client {
         System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s%6$s%n");
 
         Socket clientSocket = null;
-        BufferedReader stdin = null;
+        BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
         BufferedReader in = null;
         BufferedWriter out = null;
 
-        String srvAddress = "10.191.6.250";
+        String srvAddress = "192.168.2.221";
         int portNumber = 8008;
 
-        String srvResponse;
-        String usrInput;
-
-        /* TODO: Implement the client here, according to your specification
-         *   The client has to do the following:
-         *   - connect to the server
-         *   - initialize the dialog with the server according to your specification
-         *   - In a loop:
-         *     - read the command from the user on stdin (already created)
-         *     - send the command to the server
-         *     - read the response line from the server (using BufferedReader.readLine)
-         */
-
-        stdin = new BufferedReader(new InputStreamReader(System.in));
+        String usrInput = "";
 
         try{
-            System.out.println("Initiating connexion with " + srvAddress + " on port TCP:" + portNumber);
-
             clientSocket = new Socket(srvAddress, portNumber);
             out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
-            System.out.println("Connected successfully");
+            System.out.println(in.readLine()); //Server's Greetings
+            while (!usrInput.equals("exit")) {
+                System.out.println(in.readLine()); //Server's instruction
 
-            while(!Objects.equals(usrInput = stdin.readLine(), "exit")) {
-                out.write(usrInput);
+                usrInput = stdin.readLine();
+                out.write(usrInput + "\n");
                 out.flush();
-
-                while ((srvResponse = in.readLine()) != null) {
-                    System.out.println(srvResponse);
-                }
+                System.out.println(in.readLine()); //Server's response
             }
 
         } catch(IOException ex){
-            System.err.println("Error : " + ex.toString());
+            System.out.println("Error : " + ex.getMessage());
         }
         finally {
             try {
                 if (out != null) out.close();
             } catch (IOException ex) {
-                System.err.println("Error : " + ex.toString());
+                LOG.log(Level.SEVERE, ex.toString(), ex);
             }
             try {
                 if (in != null) in.close();
             } catch (IOException ex) {
-                System.err.println("Error : " + ex.toString());
+                LOG.log(Level.SEVERE, ex.toString(), ex);
             }
             try {
                 if (clientSocket != null && ! clientSocket.isClosed()) clientSocket.close();
             } catch (IOException ex) {
-                System.err.println("Error : " + ex.toString());
+                LOG.log(Level.SEVERE, ex.toString(), ex);
             }
         }
-
     }
 }
